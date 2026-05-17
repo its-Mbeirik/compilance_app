@@ -8,9 +8,9 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        // Proxy /api/* requests to the backend
+        // Proxy /api/v1/* requests directly to the backend /api/v1/*
         {
-          source: '/api/:path*',
+          source: '/api/v1/:path*',
           destination: 'http://backend:8000/api/v1/:path*',
         },
       ],

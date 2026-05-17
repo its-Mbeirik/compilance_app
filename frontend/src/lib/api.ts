@@ -3,10 +3,10 @@
  */
 
 // Construct API URL based on environment
-// In browser: use relative /api path (proxied by Next.js)
+// In browser: use relative /api/v1 path (proxied by Next.js)
 // In Node (SSR): use direct backend URL
 const API_BASE_URL = typeof window !== 'undefined'
-  ? '/api' // Browser: use Next.js proxy
+  ? '/api/v1' // Browser: use Next.js proxy (relative path)
   : (process.env.NEXT_PUBLIC_API_URL || 'http://backend:8000/api/v1'); // Server: direct URL
 
 export interface ContractUploadResponse {
