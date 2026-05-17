@@ -6,7 +6,7 @@ export interface ComplianceIssue {
   clause_reference: string;
   issue_type: string;
   description: string;
-  legal_reference: string;
+  legal_reference?: string;
   recommendation: string;
 }
 
