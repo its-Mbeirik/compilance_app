@@ -28,7 +28,7 @@ export function useCompliance() {
   /**
    * Upload a contract file
    */
-  const uploadContract_ = useCallback(async (file: File) => {
+  const uploadContract_ = useCallback(async (file: File): Promise<ContractUploadResponse> => {
     setState((prev) => ({
       ...prev,
       loading: true,
@@ -57,7 +57,7 @@ export function useCompliance() {
   /**
    * Verify contract compliance
    */
-  const verifyCompliance_ = useCallback(async (contractId: string) => {
+  const verifyCompliance_ = useCallback(async (contractId: string): Promise<ComplianceReport> => {
     setState((prev) => ({
       ...prev,
       loading: true,
@@ -89,7 +89,7 @@ export function useCompliance() {
   /**
    * Query compliance findings - returns just the answer text
    */
-  const queryCompliance_ = useCallback(async (contractId: string, question: string) => {
+  const queryCompliance_ = useCallback(async (contractId: string, question: string): Promise<string> => {
     setState((prev) => ({
       ...prev,
       loading: true,
