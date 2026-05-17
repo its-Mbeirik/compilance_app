@@ -8,7 +8,31 @@ from pgvector.sqlalchemy import Vector
 from datetime import datetime
 import uuid
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from app.core.config import get_settings
+
 Base = declarative_base()
+
+settings = get_settings()
+
+# Database setup
+engine = create_engine(
+    settings.database_url,
+    echo=False,
+    pool_pre_ping=True,
+    pool_recycle=3600
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+def get_db() -> Session:
+    """Get database session for dependency injection."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 class LegalDocument(Base):

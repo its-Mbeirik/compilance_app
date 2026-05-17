@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 import logging
 
-from app.main import get_db
+from app.core.database import get_db
 from app.models.database import Contract, ComplianceReport as ComplianceReportModel, ComplianceIssue as ComplianceIssueModel
 from app.services.document_processor import DocumentProcessor
 from app.agents.graph import run_compliance_verification

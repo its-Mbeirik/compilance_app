@@ -10,7 +10,7 @@ import shutil
 from pathlib import Path
 import uuid
 
-from app.main import get_db
+from app.core.database import get_db
 from app.models.database import Contract
 from app.services.document_processor import DocumentProcessor
 

@@ -3,13 +3,12 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
 
 from app.api.routes import contracts, compliance, health
 from app.core.config import get_settings
+from app.core.database import engine, SessionLocal
 from app.models.database import init_db, enable_pgvector
 
 settings = get_settings()
@@ -17,25 +16,6 @@ settings = get_settings()
 # Configure logging
 logging.basicConfig(level=settings.log_level)
 logger = logging.getLogger(__name__)
-
-# Database setup
-engine = create_engine(
-    settings.database_url,
-    echo=False,
-    pool_pre_ping=True,
-    pool_recycle=3600
-)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def get_db() -> Session:
-    """Get database session for dependency injection."""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @asynccontextmanager
