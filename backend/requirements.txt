@@ -14,8 +14,7 @@ langchain-community==0.0.25
 psycopg2-binary==2.9.9
 pgvector==0.2.4
 sqlalchemy==2.0.23
-sentence-transformers==2.2.2
-huggingface-hub==0.21.4
+sentence-transformers==2.6.1
 
 # Document Processing
 unstructured==0.11.0

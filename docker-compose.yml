@@ -40,6 +40,7 @@ services:
     volumes:
       - ./backend/data:/app/data
       - ./backend/app:/app/app
+      - ../../ressourse:/app/data/corpus
     ports:
       - "8000:8000"
     healthcheck:

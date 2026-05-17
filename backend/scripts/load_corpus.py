@@ -96,11 +96,10 @@ def load_corpus(session_maker, embedding_model):
         model = SentenceTransformer(embedding_model)
 
         # Parse laws file
-        laws_file = Path(__file__).parent.parent.parent / "data" / "laws" / "les_lois.txt"
+        laws_file = Path("/app/data/corpus/les lois.txt")
 
         # Check if file exists, if not use the ressourse folder
         if not laws_file.exists():
-            laws_file = Path.home() / "Desktop" / "iscae" / "s6" / "pfe2026" / "ressourse" / "les lois.txt"
 
         if not laws_file.exists():
             print(f"✗ Laws file not found at {laws_file}")

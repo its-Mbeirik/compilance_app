@@ -108,7 +108,7 @@ def load_all_corpus(session_maker, embedding_model):
         model = SentenceTransformer(embedding_model)
 
         # Determine resource paths
-        ressource_dir = Path.home() / "Desktop" / "iscae" / "s6" / "pfe2026" / "ressourse"
+        ressource_dir = Path("/app/data/corpus")
         txt_file = ressource_dir / "les lois.txt"
 
         if not ressource_dir.exists():
