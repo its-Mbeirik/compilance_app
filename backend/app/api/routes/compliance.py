@@ -1,6 +1,6 @@
 """Compliance verification endpoints."""
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Body
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from enum import Enum
@@ -236,7 +236,7 @@ async def get_compliance_report(contract_id: str, db: Session = Depends(get_db))
 
 
 @router.post("/compliance/{contract_id}/query")
-async def query_compliance(contract_id: str, question: str, db: Session = Depends(get_db)):
+async def query_compliance(contract_id: str, question: str = Body(..., embed=True), db: Session = Depends(get_db)):
     """
     Interactive Q&A mode for compliance-related questions.
 

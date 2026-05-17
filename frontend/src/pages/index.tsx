@@ -66,21 +66,34 @@ To get started, simply **upload a document** (PDF/DOCX) using the attachment but
       };
       setMessages((prev) => [...prev, uploadingMessage]);
 
-      // Upload and analyze
-      const response = await uploadContract(file, 'statuts_entreprise');
+      // Upload contract
+      const response = await uploadContract(file);
       setContractId(response.contract_id);
 
       const analysisMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: `✓ Document uploaded successfully!\n\n**Contract ID:** ${response.contract_id}\n\n📊 Analyzing for compliance issues...\n\nI'll review your document against Mauritanian labor law and corporate regulations. What would you like to know about this contract?`,
+        content: `✓ Document uploaded successfully!\n\n**Contract ID:** ${response.contract_id}\n**Type:** ${response.document_type}\n\n📊 Analyzing for compliance issues...\n\nI'll review your document against Mauritanian law. What would you like to know about this contract?`,
         timestamp: new Date(),
-        report: report || undefined,
       };
       setMessages((prev) => [...prev, analysisMessage]);
 
       // Trigger verification
-      await verifyCompliance(response.contract_id);
+      try {
+        await verifyCompliance(response.contract_id);
+
+        // Add report message after verification completes
+        const reportMessage: Message = {
+          id: (Date.now() + 2).toString(),
+          type: 'assistant',
+          content: `✓ Analysis complete! Your compliance report is ready.`,
+          timestamp: new Date(),
+          report: report,
+        };
+        setMessages((prev) => [...prev, reportMessage]);
+      } catch (verifyError) {
+        console.error('Verification error:', verifyError);
+      }
     } catch (err) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),

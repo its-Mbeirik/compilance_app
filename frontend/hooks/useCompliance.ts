@@ -10,34 +10,16 @@ import {
   queryCompliance,
   ContractUploadResponse,
   ComplianceReport,
-  QueryResponse,
 } from "@/lib/api";
 
 export interface ComplianceState {
-  // Upload state
-  isUploading: boolean;
-  uploadProgress: number;
-  uploadError?: string;
-  uploadedContract?: ContractUploadResponse;
-
-  // Verification state
-  isVerifying: boolean;
-  verificationProgress: string;
-  verificationError?: string;
-  complianceReport?: ComplianceReport;
-
-  // Query state
-  isQuerying: boolean;
-  queryError?: string;
-  queryResponse?: QueryResponse;
+  loading: boolean;
+  error?: string;
+  report?: ComplianceReport;
 }
 
 const initialState: ComplianceState = {
-  isUploading: false,
-  uploadProgress: 0,
-  isVerifying: false,
-  verificationProgress: "",
-  isQuerying: false,
+  loading: false,
 };
 
 export function useCompliance() {
@@ -46,36 +28,27 @@ export function useCompliance() {
   /**
    * Upload a contract file
    */
-  const upload = useCallback(async (file: File) => {
+  const uploadContract_ = useCallback(async (file: File) => {
     setState((prev) => ({
       ...prev,
-      isUploading: true,
-      uploadError: undefined,
-      uploadProgress: 0,
+      loading: true,
+      error: undefined,
     }));
 
     try {
-      // Simulate upload progress
-      setState((prev) => ({ ...prev, uploadProgress: 30 }));
-
       const result = await uploadContract(file);
-
       setState((prev) => ({
         ...prev,
-        uploadProgress: 100,
-        uploadedContract: result,
-        isUploading: false,
+        loading: false,
       }));
-
       return result;
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Upload failed";
       setState((prev) => ({
         ...prev,
-        isUploading: false,
-        uploadError: message,
-        uploadProgress: 0,
+        loading: false,
+        error: message,
       }));
       throw error;
     }
@@ -84,45 +57,20 @@ export function useCompliance() {
   /**
    * Verify contract compliance
    */
-  const verify = useCallback(async (contractId: string) => {
+  const verifyCompliance_ = useCallback(async (contractId: string) => {
     setState((prev) => ({
       ...prev,
-      isVerifying: true,
-      verificationError: undefined,
-      verificationProgress: "Starting compliance verification...",
+      loading: true,
+      error: undefined,
     }));
 
     try {
-      setState((prev) => ({
-        ...prev,
-        verificationProgress: "Extracting contract clauses...",
-      }));
-      await new Promise((r) => setTimeout(r, 500));
-
-      setState((prev) => ({
-        ...prev,
-        verificationProgress: "Matching clauses against legal corpus...",
-      }));
-      await new Promise((r) => setTimeout(r, 500));
-
-      setState((prev) => ({
-        ...prev,
-        verificationProgress: "Analyzing compliance issues...",
-      }));
-      await new Promise((r) => setTimeout(r, 500));
-
-      setState((prev) => ({
-        ...prev,
-        verificationProgress: "Generating report...",
-      }));
-
       const report = await verifyCompliance(contractId);
 
       setState((prev) => ({
         ...prev,
-        isVerifying: false,
-        verificationProgress: "Compliance verification complete!",
-        complianceReport: report,
+        loading: false,
+        report: report,
       }));
 
       return report;
@@ -131,22 +79,21 @@ export function useCompliance() {
         error instanceof Error ? error.message : "Verification failed";
       setState((prev) => ({
         ...prev,
-        isVerifying: false,
-        verificationError: message,
-        verificationProgress: "",
+        loading: false,
+        error: message,
       }));
       throw error;
     }
   }, []);
 
   /**
-   * Query compliance findings
+   * Query compliance findings - returns just the answer text
    */
-  const query = useCallback(async (contractId: string, question: string) => {
+  const queryCompliance_ = useCallback(async (contractId: string, question: string) => {
     setState((prev) => ({
       ...prev,
-      isQuerying: true,
-      queryError: undefined,
+      loading: true,
+      error: undefined,
     }));
 
     try {
@@ -154,18 +101,18 @@ export function useCompliance() {
 
       setState((prev) => ({
         ...prev,
-        isQuerying: false,
-        queryResponse: response,
+        loading: false,
       }));
 
-      return response;
+      // Return just the answer text
+      return response.answer;
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Query failed";
       setState((prev) => ({
         ...prev,
-        isQuerying: false,
-        queryError: message,
+        loading: false,
+        error: message,
       }));
       throw error;
     }
@@ -179,7 +126,7 @@ export function useCompliance() {
       const report = await getComplianceReport(contractId);
       setState((prev) => ({
         ...prev,
-        complianceReport: report,
+        report: report,
       }));
       return report;
     } catch (error) {
@@ -187,7 +134,7 @@ export function useCompliance() {
         error instanceof Error ? error.message : "Failed to fetch report";
       setState((prev) => ({
         ...prev,
-        verificationError: message,
+        error: message,
       }));
       throw error;
     }
@@ -201,10 +148,12 @@ export function useCompliance() {
   }, []);
 
   return {
-    ...state,
-    upload,
-    verify,
-    query,
+    loading: state.loading,
+    error: state.error,
+    report: state.report,
+    uploadContract: uploadContract_,
+    verifyCompliance: verifyCompliance_,
+    queryCompliance: queryCompliance_,
     getReport,
     reset,
   };
