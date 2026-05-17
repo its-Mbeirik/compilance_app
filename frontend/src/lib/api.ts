@@ -2,12 +2,19 @@
  * API client for Compliance Verification System
  */
 
-// Construct API URL based on environment
-// In browser: use relative /api/v1 path (proxied by Next.js)
-// In Node (SSR): use direct backend URL
-const API_BASE_URL = typeof window !== 'undefined'
-  ? '/api/v1' // Browser: use Next.js proxy (relative path)
-  : (process.env.NEXT_PUBLIC_API_URL || 'http://backend:8000/api/v1'); // Server: direct URL
+// API URL configuration
+// For Docker: use backend service URL (for server-side calls)
+// For browser: use localhost:8000 (accessible from host machine)
+const API_BASE_URL = (() => {
+  // Server-side rendering (Node.js environment)
+  if (typeof window === 'undefined') {
+    return process.env.BACKEND_URL || 'http://backend:8000/api/v1';
+  }
+
+  // Browser environment - use localhost for API calls
+  // This works because localhost:8000 is accessible from the host machine
+  return 'http://localhost:8000/api/v1';
+})();
 
 export interface ContractUploadResponse {
   contract_id: string;
