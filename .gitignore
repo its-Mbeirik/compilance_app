@@ -10,8 +10,10 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# lib/ and lib64/ for Python build artifacts, but not frontend source code
+# Only ignore top-level lib (python) and lib64
+/lib/
+/lib64/
 parts/
 sdist/
 var/
