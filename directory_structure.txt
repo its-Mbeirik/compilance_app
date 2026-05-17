@@ -1,0 +1,80 @@
+assistanteconformite/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── core/
+│   │   │   ├── __init__.py
+│   │   │   ├── config.py
+│   │   │   └── security.py
+│   │   ├── api/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── contracts.py
+│   │   │   │   ├── compliance.py
+│   │   │   │   └── health.py
+│   │   │   └── schemas.py
+│   │   ├── agents/
+│   │   │   ├── __init__.py
+│   │   │   ├── graph.py
+│   │   │   ├── extraction_agent.py
+│   │   │   ├── legal_matching_agent.py
+│   │   │   ├── compliance_agent.py
+│   │   │   └── report_agent.py
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── document_processor.py
+│   │   │   ├── vector_store.py
+│   │   │   └── compliance_checker.py
+│   │   └── models/
+│   │       ├── __init__.py
+│   │       └── database.py
+│   ├── tests/
+│   │   ├── __init__.py
+│   │   ├── test_agents.py
+│   │   └── test_api.py
+│   ├── data/
+│   │   ├── laws/
+│   │   └── test_contracts/
+│   ├── requirements.txt
+│   ├── .env.example
+│   └── README.md
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Layout.tsx
+│   │   │   ├── UploadArea.tsx
+│   │   │   ├── ResultsDisplay.tsx
+│   │   │   └── ComplianceReport.tsx
+│   │   ├── pages/
+│   │   │   ├── _app.tsx
+│   │   │   ├── index.tsx
+│   │   │   ├── api/
+│   │   │   │   └── [...].ts
+│   │   │   └── dashboard.tsx
+│   │   ├── styles/
+│   │   │   └── globals.css
+│   │   ├── hooks/
+│   │   │   └── useCompliance.ts
+│   │   └── types/
+│   │       └── index.ts
+│   ├── public/
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   ├── .env.local.example
+│   └── README.md
+├── docker-compose.yml
+├── Dockerfile.backend
+├── Dockerfile.frontend
+├── .gitignore
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── docs/
+│   ├── architecture.md
+│   ├── setup.md
+│   └── api.md
+└── README.md
