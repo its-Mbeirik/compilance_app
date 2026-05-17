@@ -55,9 +55,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://backend:8000/api/v1
     container_name: compliance_frontend
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000
+      NEXT_PUBLIC_API_URL: http://backend:8000/api/v1
     depends_on:
       - backend
     ports:
