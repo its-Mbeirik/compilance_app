@@ -10,7 +10,7 @@ import {
   queryCompliance,
   ContractUploadResponse,
   ComplianceReport,
-} from "@/lib/api";
+} from "../lib/api";
 
 export interface ComplianceState {
   loading: boolean;
