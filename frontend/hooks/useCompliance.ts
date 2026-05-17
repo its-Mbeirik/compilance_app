@@ -22,7 +22,18 @@ const initialState: ComplianceState = {
   loading: false,
 };
 
-export function useCompliance() {
+interface UseComplianceReturn {
+  loading: boolean;
+  error?: string;
+  report?: ComplianceReport;
+  uploadContract: (file: File) => Promise<ContractUploadResponse>;
+  verifyCompliance: (contractId: string) => Promise<ComplianceReport>;
+  queryCompliance: (contractId: string, question: string) => Promise<string>;
+  getReport: (contractId: string) => Promise<ComplianceReport>;
+  reset: () => void;
+}
+
+export function useCompliance(): UseComplianceReturn {
   const [state, setState] = useState<ComplianceState>(initialState);
 
   /**
