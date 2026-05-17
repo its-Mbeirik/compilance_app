@@ -3,7 +3,18 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Proxy /api/* requests to the backend
+        {
+          source: '/api/:path*',
+          destination: 'http://backend:8000/api/v1/:path*',
+        },
+      ],
+    }
   },
   headers: async () => {
     return [

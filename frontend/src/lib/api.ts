@@ -2,7 +2,12 @@
  * API client for Compliance Verification System
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+// Construct API URL based on environment
+// In browser: use relative /api path (proxied by Next.js)
+// In Node (SSR): use direct backend URL
+const API_BASE_URL = typeof window !== 'undefined'
+  ? '/api' // Browser: use Next.js proxy
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://backend:8000/api/v1'); // Server: direct URL
 
 export interface ContractUploadResponse {
   contract_id: string;
