@@ -1,134 +1,171 @@
-import { useState, useCallback } from 'react';
-import axios from 'axios';
-import { ComplianceReport, ContractUploadResponse, ProcessingStatus } from '@/types';
+/**
+ * React hook for compliance verification workflow
+ */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { useState, useCallback } from "react";
+import {
+  uploadContract,
+  verifyCompliance,
+  getComplianceReport,
+  queryCompliance,
+  ContractUploadResponse,
+  ComplianceReport,
+} from "@/lib/api";
+
+export interface ComplianceState {
+  loading: boolean;
+  error?: string;
+  report?: ComplianceReport;
+}
+
+const initialState: ComplianceState = {
+  loading: false,
+};
 
 interface UseComplianceReturn {
   loading: boolean;
-  error: string | null;
-  report: ComplianceReport | null;
-  status: ProcessingStatus | null;
-  uploadContract: (file: File, documentType: string) => Promise<ContractUploadResponse>;
+  error?: string;
+  report?: ComplianceReport;
+  uploadContract: (file: File) => Promise<ContractUploadResponse>;
   verifyCompliance: (contractId: string) => Promise<ComplianceReport>;
-  getComplianceReport: (contractId: string) => Promise<ComplianceReport>;
   queryCompliance: (contractId: string, question: string) => Promise<string>;
+  getReport: (contractId: string) => Promise<ComplianceReport>;
+  reset: () => void;
 }
 
-export const useCompliance = (): UseComplianceReturn => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [report, setReport] = useState<ComplianceReport | null>(null);
-  const [status, setStatus] = useState<ProcessingStatus | null>(null);
+export function useCompliance(): UseComplianceReturn {
+  const [state, setState] = useState<ComplianceState>(initialState);
 
-  const uploadContract = useCallback(
-    async (file: File, documentType: string): Promise<ContractUploadResponse> => {
-      setLoading(true);
-      setError(null);
+  /**
+   * Upload a contract file
+   */
+  const uploadContract_ = useCallback(async (file: File): Promise<ContractUploadResponse> => {
+    setState((prev) => ({
+      ...prev,
+      loading: true,
+      error: undefined,
+    }));
 
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
+    try {
+      const result = await uploadContract(file);
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+      }));
+      return result;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Upload failed";
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: message,
+      }));
+      throw error;
+    }
+  }, []);
 
-        const response = await axios.post<ContractUploadResponse>(
-          `${API_URL}/api/v1/contracts/upload`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
+  /**
+   * Verify contract compliance
+   */
+  const verifyCompliance_ = useCallback(async (contractId: string): Promise<ComplianceReport> => {
+    setState((prev) => ({
+      ...prev,
+      loading: true,
+      error: undefined,
+    }));
 
-        return response.data;
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Upload failed';
-        setError(errorMsg);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+    try {
+      const report = await verifyCompliance(contractId);
 
-  const verifyCompliance = useCallback(
-    async (contractId: string): Promise<ComplianceReport> => {
-      setLoading(true);
-      setError(null);
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        report: report,
+      }));
 
-      try {
-        const response = await axios.post<ComplianceReport>(
-          `${API_URL}/api/v1/compliance/verify/${contractId}`
-        );
+      return report;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Verification failed";
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: message,
+      }));
+      throw error;
+    }
+  }, []);
 
-        setReport(response.data);
-        return response.data;
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Verification failed';
-        setError(errorMsg);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  /**
+   * Query compliance findings - returns just the answer text
+   */
+  const queryCompliance_ = useCallback(async (contractId: string, question: string): Promise<string> => {
+    setState((prev) => ({
+      ...prev,
+      loading: true,
+      error: undefined,
+    }));
 
-  const getComplianceReport = useCallback(
-    async (contractId: string): Promise<ComplianceReport> => {
-      setLoading(true);
-      setError(null);
+    try {
+      const response = await queryCompliance(contractId, question);
 
-      try {
-        const response = await axios.get<ComplianceReport>(
-          `${API_URL}/api/v1/compliance/${contractId}`
-        );
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+      }));
 
-        setReport(response.data);
-        return response.data;
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Failed to fetch report';
-        setError(errorMsg);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+      // Return just the answer text
+      return response.answer;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Query failed";
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: message,
+      }));
+      throw error;
+    }
+  }, []);
 
-  const queryCompliance = useCallback(
-    async (contractId: string, question: string): Promise<string> => {
-      setLoading(true);
-      setError(null);
+  /**
+   * Get cached report
+   */
+  const getReport = useCallback(async (contractId: string) => {
+    try {
+      const report = await getComplianceReport(contractId);
+      setState((prev) => ({
+        ...prev,
+        report: report,
+      }));
+      return report;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to fetch report";
+      setState((prev) => ({
+        ...prev,
+        error: message,
+      }));
+      throw error;
+    }
+  }, []);
 
-      try {
-        const response = await axios.post(
-          `${API_URL}/api/v1/compliance/${contractId}/query`,
-          { question }
-        );
-
-        return response.data.answer;
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Query failed';
-        setError(errorMsg);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  /**
+   * Reset state
+   */
+  const reset = useCallback(() => {
+    setState(initialState);
+  }, []);
 
   return {
-    loading,
-    error,
-    report,
-    status,
-    uploadContract,
-    verifyCompliance,
-    getComplianceReport,
-    queryCompliance,
+    loading: state.loading,
+    error: state.error,
+    report: state.report,
+    uploadContract: uploadContract_,
+    verifyCompliance: verifyCompliance_,
+    queryCompliance: queryCompliance_,
+    getReport,
+    reset,
   };
-};
+}
